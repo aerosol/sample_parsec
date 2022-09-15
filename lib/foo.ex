@@ -17,22 +17,29 @@ defmodule Foo do
 
     literal_value =
       ascii_string([?a..?z, ?A..?Z, ?0..9], min: 1)
-      |> optional(string("\\|") |> replace("|"))
-      |> optional(ascii_string([?a..?z, ?A..?Z, ?0..9], min: 1))
+      |> concat(optional(string("\\|") |> replace("|")))
+      |> concat(optional(ascii_string([?a..?z, ?A..?Z, ?0..9], min: 1)))
       |> reduce({Enum, :join, [""]})
 
-    list_of_literals =
+    alternative_separator =
+      string("|")
+      |> replace(:or)
+
+    alternative_of_values =
+      literal_value
+      |> concat(times(concat(alternative_separator, literal_value), min: 1))
+      |> reduce({:parse_alternative, []})
+
+    expression =
       choice([
-        ascii_string([?a..?z, ?A..?Z, ?0..9], min: 1),
-        string("|") |> replace(:or)
+        alternative_of_values,
+        literal_value
       ])
 
-    value =
-      choice([
-        literal_value,
-        list_of_literals
-      ])
+    defparsec(:filter, key |> concat(operator) |> concat(expression), debug: true)
 
-    defparsec(:filter, key |> concat(operator) |> concat(repeat(value)), debug: true)
+    defp parse_alternative(args) do
+      Enum.reject(args, &(&1 == :or))
+    end
   end
 end

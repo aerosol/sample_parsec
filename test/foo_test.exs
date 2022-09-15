@@ -14,6 +14,7 @@ defmodule FooTest do
       "event:goal!=foo",
       "abc==foo",
       "some==a|b|c",
+      "omg==a|b\\|c",
       "some==a\\|b",
       "some!=a\\|b"
     ]
