@@ -4,23 +4,28 @@ defmodule FooTest do
 
   test "greets the world" do
     inputs = [
-      "*==foobar",
-      "*!=foobar",
-      "event:goal==foo",
-      "some==foo",
-      "abc!=xyz",
-      "some==foo|bar",
-      "some!=foo|bar",
-      "event:goal!=foo",
-      "abc==foo",
-      "some==a|b|c",
-      "omg==a|b\\|c",
-      "some==a\\|b",
-      "some!=a\\|b"
+      "source==**/hello/**",
+      "page==*/hi/*",
+      "event==/site/**",
+      "goal==/site/**|somethingelse",
+      "goal==/foo/**/bar",
+      "device==foo",
+      "device!=xyz",
+      "os==foo|bar",
+      "os!=foo|bar",
+      "utm_source!=foo",
+      "screen==a|b|c",
+      "region==a|b\\|c",
+      "city==a\\|b",
+      "entry_page!=a\\|b",
+      "exit_page==/hello/world/**"
     ]
 
     for i <- inputs do
-      Foo.Parser.filter(i) |> IO.inspect(label: "#{i}\t\t\t")
+      {:ok, match, _, _, _, _} = Foo.Parser.filter(i)
+
+      match
+      |> IO.inspect(label: IO.ANSI.yellow() <> "#{i}" <> IO.ANSI.reset())
     end
   end
 end
